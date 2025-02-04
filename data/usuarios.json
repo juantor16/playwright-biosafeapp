@@ -1,0 +1,9 @@
+{
+    "usuarios":{
+        "correcto": {
+            "nombre": "Mariano",
+            "contrasena": "Abc123+",
+            "email":"ateneaconocimientos@gmail.com"
+        }
+    }
+}
