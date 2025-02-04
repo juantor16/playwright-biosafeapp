@@ -1,18 +1,35 @@
 import { test, expect } from '@playwright/test';
+import PaginaLanding from '../pages/PaginaLanding';
+import PaginaSignup from '../pages/PaginaSignup';
+import data from '../data/usuarios.json'
+import { getVerificationCode } from '../utils/gmailUtils';
+import PaginaVerificacionEmail from '../pages/PaginaVerificacionEmail';
+import PaginaLogin from '../pages/PaginaLogin';
 
-test('has title', async ({ page }) => {
-  await page.goto('https://playwright.dev/');
+let paginaLanding: PaginaLanding;
+let paginaSignup: PaginaSignup;
+let paginaVerificacionEmail: PaginaVerificacionEmail;
+let paginaLogin: PaginaLogin;
 
-  // Expect a title "to contain" a substring.
-  await expect(page).toHaveTitle(/Playwright/);
-});
+test('C-1 · Registro Happy Path', async ({ page }) => {
+  paginaLanding = new PaginaLanding(page)
+  paginaSignup = new PaginaSignup(page)
+  paginaVerificacionEmail = new PaginaVerificacionEmail(page)
+  paginaLogin = new PaginaLogin(page)
+  await page.goto('https://qa.biosafeapp.com');
+  await paginaLanding.irARegristroDeCuenta()
+  const emailDeusuarioUnico = await paginaSignup.completarRegistroExitoso(data.usuarios.correcto)
+  await expect(page).toHaveURL('https://qa.biosafeapp.com/verify-email')
 
-test('get started link', async ({ page }) => {
-  await page.goto('https://playwright.dev/');
+  const verificationCode = await getVerificationCode()
 
-  // Click the get started link.
-  await page.getByRole('link', { name: 'Get started' }).click();
-
-  // Expects page to have a heading with the name of Installation.
-  await expect(page.getByRole('heading', { name: 'Installation' })).toBeVisible();
+  console.log("Código de verificación: ", verificationCode)
+  await paginaVerificacionEmail.codigoVerificacionInput.fill(verificationCode)
+  await paginaVerificacionEmail.verificarButton.click()
+  await expect(paginaVerificacionEmail.verificacionExitosaAlert).toBeVisible()
+  await expect(page).toHaveURL('https://qa.biosafeapp.com/login')
+  await paginaLogin.emailInput.fill(emailDeusuarioUnico)
+  await paginaLogin.passwordInput.fill(data.usuarios.correcto.contrasena)
+  await paginaLogin.loginButton.click();
+  await expect(page).toHaveURL('https://qa.biosafeapp.com/dashboard')
 });
