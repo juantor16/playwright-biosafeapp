@@ -37,3 +37,4 @@ test('C-1 · Registro Happy Path', async ({ page }) => {
   await paginaLogin.loginButton.click();
   await expect(page).toHaveURL('https://qa.biosafeapp.com/dashboard')
 });
+
