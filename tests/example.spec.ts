@@ -5,17 +5,22 @@ import data from '../data/usuarios.json'
 import { getVerificationCode } from '../utils/gmailUtils';
 import PaginaVerificacionEmail from '../pages/PaginaVerificacionEmail';
 import PaginaLogin from '../pages/PaginaLogin';
+import { afterEach } from 'node:test';
 
 let paginaLanding: PaginaLanding;
 let paginaSignup: PaginaSignup;
 let paginaVerificacionEmail: PaginaVerificacionEmail;
 let paginaLogin: PaginaLogin;
 
-test('C-1 · Registro Happy Path', async ({ page }) => {
+test.beforeEach(async ({ page }) => {
+  console.log("BeforeEach: Configuracion inicial")
   paginaLanding = new PaginaLanding(page)
   paginaSignup = new PaginaSignup(page)
   paginaVerificacionEmail = new PaginaVerificacionEmail(page)
   paginaLogin = new PaginaLogin(page)
+});
+
+test('C-1 · Registro Happy Path', async ({ page }) => {
   await page.goto('https://qa.biosafeapp.com');
   await paginaLanding.irARegristroDeCuenta()
   const emailDeusuarioUnico = await paginaSignup.completarRegistroExitoso(data.usuarios.correcto)
