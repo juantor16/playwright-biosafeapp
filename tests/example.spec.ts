@@ -5,7 +5,6 @@ import data from '../data/usuarios.json'
 import { getVerificationCode } from '../utils/gmailUtils';
 import PaginaVerificacionEmail from '../pages/PaginaVerificacionEmail';
 import PaginaLogin from '../pages/PaginaLogin';
-import { afterEach } from 'node:test';
 
 let paginaLanding: PaginaLanding;
 let paginaSignup: PaginaSignup;
