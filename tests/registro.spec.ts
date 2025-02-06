@@ -5,6 +5,10 @@ import data from '../data/usuarios.json'
 import { getVerificationCode } from '../utils/gmailUtils';
 import PaginaVerificacionEmail from '../pages/PaginaVerificacionEmail';
 import PaginaLogin from '../pages/PaginaLogin';
+import dotenv from 'dotenv';
+
+// Cargar variables de entorno desde el archivo .env
+dotenv.config();
 
 let paginaLanding: PaginaLanding;
 let paginaSignup: PaginaSignup;
@@ -20,21 +24,22 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('C-1 · Registro Happy Path', async ({ page }) => {
-  await page.goto('https://qa.biosafeapp.com');
+  await page.goto(process.env.BASE_URL!);
   await paginaLanding.irARegristroDeCuenta()
   const emailDeusuarioUnico = await paginaSignup.completarRegistroExitoso(data.usuarios.correcto)
-  await expect(page).toHaveURL('https://qa.biosafeapp.com/verify-email')
 
+  await expect(page).toHaveURL(process.env.BASE_URL! + '/verify-email')
+  await page.waitForTimeout(1000)
   const verificationCode = await getVerificationCode()
 
   console.log("Código de verificación: ", verificationCode)
   await paginaVerificacionEmail.codigoVerificacionInput.fill(verificationCode)
   await paginaVerificacionEmail.verificarButton.click()
-  await expect(paginaVerificacionEmail.verificacionExitosaAlert).toBeVisible()
-  await expect(page).toHaveURL('https://qa.biosafeapp.com/login')
+  await expect(paginaVerificacionEmail.verificacionExitosaAlert).toBeVisible({ timeout: 10000 })
+  await expect(page).toHaveURL(process.env.BASE_URL! + '/login')
   await paginaLogin.emailInput.fill(emailDeusuarioUnico)
   await paginaLogin.passwordInput.fill(data.usuarios.correcto.contrasena)
   await paginaLogin.loginButton.click();
-  await expect(page).toHaveURL('https://qa.biosafeapp.com/dashboard')
+  await expect(page).toHaveURL(process.env.BASE_URL! + '/dashboard')
 });
 
